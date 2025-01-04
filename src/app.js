@@ -20,12 +20,10 @@ app.use(
       // Allow *.vercel.app or localhost:5173
       if (
         process.env.NODE_ENV === "development" ||
-        ( origin &&
-          ( origin.match(/^https?:\/\/(.*\.)?vercel\.app$/) ||
+        (origin &&
+          (origin.match(/^https?:\/\/(.*\.)?vercel\.app$/) ||
             origin === "http://localhost:5173" ||
-            origin === "http://localhost:3000"
-          )
-        )
+            origin === "http://localhost:3000"))
       ) {
         callback(null, true);
       } else {
@@ -34,11 +32,11 @@ app.use(
     },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
-  })
+  }),
 );
 app.use(cookieParser());
 
-const server = http.createServer(app);
+export const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -46,13 +44,11 @@ const io = new Server(server, {
   },
 });
 
-app.get("/", (_req, res) => {
-  res.send("Server is working fine");
-});
-
 app.use("/api/chat", chatRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/games", gameRoutes);
+
+io.on("connection_error", console.error);
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
