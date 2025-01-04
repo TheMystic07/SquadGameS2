@@ -1,4 +1,4 @@
-import Vote from "../models/vote.js";
+import Vote from "../models/voteModel.js";
 import { calculateResults } from "../services/votingService.js";
 
 export const castVote = async (req, res) => {
@@ -14,7 +14,7 @@ export const castVote = async (req, res) => {
   }
 };
 
-export const getResults = async (req, res) => {
+export const getResults = async (_req, res) => {
   try {
     const results = await calculateResults();
     res.status(200).json(results);

@@ -22,7 +22,9 @@ app.use(
         process.env.NODE_ENV === "development" ||
         ( origin &&
           ( origin.match(/^https?:\/\/(.*\.)?vercel\.app$/) ||
-            origin === "http://localhost:5173" )
+            origin === "http://localhost:5173" ||
+            origin === "http://localhost:3000"
+          )
         )
       ) {
         callback(null, true);
@@ -37,7 +39,12 @@ app.use(
 app.use(cookieParser());
 
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
 
 app.get("/", (_req, res) => {
   res.send("Server is working fine");

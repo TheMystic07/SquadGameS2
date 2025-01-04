@@ -1,4 +1,4 @@
-import Vote from "../models/vote.js";
+import Vote from "../models/voteModel.js";
 
 export const validateVote = async (req, res, next) => {
   const { userId } = req.user;

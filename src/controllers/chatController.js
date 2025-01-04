@@ -16,6 +16,7 @@ export async function getMainChat(_req, res) {
 }
 
 export async function sendMessage(req, res) {
+  console.log("sendMessage");
   const { chatId, sender, content, type } = req.body;
   const io = req.app.get("socketio");
 
@@ -40,6 +41,12 @@ export async function sendMessage(req, res) {
       } else {
         chat.messages.push({ sender, content });
         await chat.save();
+
+        // the chat object returns all messages, which is not ideal
+        // consider returning only the new message
+        io.to("lobby").emit("publicMessage", { sender, content });
+
+
         return res.status(200).json(chat);
       }
     }
@@ -59,7 +66,7 @@ export async function sendMessage(req, res) {
       chat.messages.push({ sender, content });
       await chat.save();
 
-      io.to(chatId).emit("privateMessage", { sender, content });
+      io.to(chatId).emit("privateMessage", chat.messages.slice(-1)[0]);
       return res.status(200).json(chat);
     }
 

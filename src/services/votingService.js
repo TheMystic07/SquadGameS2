@@ -1,4 +1,4 @@
-import Vote from "../models/vote.js";
+import Vote from "../models/voteModel.js";
 
 export const calculateResults = async () => {
   const votes = await Vote.find();
