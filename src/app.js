@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 
 import chatRoutes from "./routers/chatRoutes.js";
 import userRoutes from "./routers/userRoutes.js";
+import gameRoutes from "./routers/gameRoutes.js";
 
 export const app = express();
 
@@ -44,6 +45,7 @@ app.get("/", (_req, res) => {
 
 app.use("/api/chat", chatRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/games", gameRoutes);
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
