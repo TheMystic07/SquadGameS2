@@ -35,7 +35,7 @@ export async function sendMessage(req, res) {
         const newChat = new Chat({ participants: ["lobby"], messages: [{ sender, content }] });
         await newChat.save();
 
-        io.to("lobby").emit("publicMessage", { sender, content });
+        io.to("lobby").emit("publicMessage", chat.messages.slice(-1)[0]);
 
         return res.status(201).json(newChat);
       } else {
@@ -44,7 +44,7 @@ export async function sendMessage(req, res) {
 
         // the chat object returns all messages, which is not ideal
         // consider returning only the new message
-        io.to("lobby").emit("publicMessage", { sender, content });
+        io.to("lobby").emit("publicMessage", chat.messages.slice(-1)[0]);
 
 
         return res.status(200).json(chat);
