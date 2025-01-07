@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const voteSchema = new mongoose.Schema({
-  userId: { type: String, required: true, unique: true },
+  walletAddress: { type: String, required: true, unique: true },
   shape: { type: String, required: true, enum: ["circle", "square", "triangle", "hexagon"] },
 });
 
