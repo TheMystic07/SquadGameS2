@@ -8,10 +8,10 @@ const router = Router();
 
 // Login route
 router.post("/login", async (req, res) => {
-  const { walletAddress, username } = req.body;
+  const { walletAddress } = req.body;
 
-  if (!walletAddress || !username) {
-    return res.status(400).json({ error: "Wallet address and username are required." });
+  if (!walletAddress) {
+    return res.status(400).json({ error: "Wallet address is required." });
   }
 
   try {
@@ -19,7 +19,7 @@ router.post("/login", async (req, res) => {
 
     if (!user) {
       // Automatically create the user
-      user = new User({ walletAddress, username });
+      user = new User({ walletAddress });
       await user.save();
     }
 
