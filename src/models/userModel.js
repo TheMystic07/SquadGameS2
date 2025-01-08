@@ -1,7 +1,8 @@
 import { Schema, model } from "mongoose";
 
 const userSchema = new Schema({
-  nftNumber: { type: String, unique: true, required: true },
+  walletAddress: { type: String, unique: true, required: true },
+  nftNumber: { type: String, unique: true, required: false },
   username: { type: String, required: true },
 });
 

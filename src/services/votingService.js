@@ -1,5 +1,5 @@
 import Vote from "../models/voteModel.js";
-import User from "../models/userModel.js"; // Assuming you have a User model
+import User from "../models/userModel.js";
 
 export const calculateResults = async () => {
   try {

@@ -16,62 +16,55 @@ export async function getMainChat(_req, res) {
 }
 
 export async function sendMessage(req, res) {
-  console.log("sendMessage");
-  const { chatId, sender, content, type } = req.body;
+  const { chatId, walletAddress, content, type } = req.body;
   const io = req.app.get("socketio");
 
-  console.log(io.sockets.adapter.rooms);
-
-  if (!sender || !content || !type) {
+  if (!walletAddress || !content || !type) {
     return res.status(400).json({ error: "Invalid message data" });
   }
 
   try {
+    const sender = await User.findOne({ walletAddress });
+    if (!sender) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const nftNumber = sender.nftNumber;
+
     // LOBBY CHAT
-    if (type === 'public') {
+    if (type === "public") {
       const chat = await Chat.findOne({ participants: "main_group" });
       if (!chat) {
-        // If no lobby chat exists, create one
-        const newChat = new Chat({ participants: ["lobby"], messages: [{ sender, content }] });
+        const newChat = new Chat({ participants: ["main_group"], messages: [{ sender: nftNumber, content }] });
         await newChat.save();
-
         io.to("lobby").emit("publicMessage", chat.messages.slice(-1)[0]);
-
         return res.status(201).json(newChat);
       } else {
-        chat.messages.push({ sender, content });
+        chat.messages.push({ sender: nftNumber, content });
         await chat.save();
-
-        // the chat object returns all messages, which is not ideal
-        // consider returning only the new message
         io.to("lobby").emit("publicMessage", chat.messages.slice(-1)[0]);
-
-
         return res.status(200).json(chat);
       }
     }
 
-    // PRIVATE ROOM / CHAT
-    if (type === 'private' && chatId) {
+    // PRIVATE CHAT
+    if (type === "private" && chatId) {
       const chat = await Chat.findById(chatId);
       if (!chat) {
         return res.status(404).json({ error: "Chat not found" });
       }
 
-      // check if the sender is a participant of the chat
-      if (!chat.participants.includes(sender)) {
+      if (!chat.participants.includes(nftNumber)) {
         return res.status(403).json({ error: "You are not a participant of this chat" });
       }
 
-      chat.messages.push({ sender, content });
+      chat.messages.push({ sender: nftNumber, content });
       await chat.save();
-
       io.to(chatId).emit("privateMessage", chat.messages.slice(-1)[0]);
       return res.status(200).json(chat);
     }
 
     return res.status(400).json({ error: "Invalid message type" });
-
   } catch (error) {
     console.error("Error sending message:", error);
     res.status(500).json({ error: "Error sending message" });
