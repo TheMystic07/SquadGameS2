@@ -30,7 +30,7 @@ export async function sendMessage(req, res) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const nftNumber = sender.nftNumber;
+    const nftNumber = sender.walletAddress;
 
     // LOBBY CHAT
     if (type === "public") {
@@ -38,14 +38,13 @@ export async function sendMessage(req, res) {
       if (!chat) {
         const newChat = new Chat({ participants: ["main_group"], messages: [{ sender: nftNumber, content }] });
         await newChat.save();
-        io.to("lobby").emit("publicMessage", chat.messages.slice(-1)[0]);
+        io.to("lobby").emit("publicMessage", newChat.messages.slice(-1)[0]);
         return res.status(201).json(newChat);
-      } else {
+      }
         chat.messages.push({ sender: nftNumber, content });
         await chat.save();
         io.to("lobby").emit("publicMessage", chat.messages.slice(-1)[0]);
         return res.status(200).json(chat);
-      }
     }
 
     // PRIVATE CHAT
@@ -93,9 +92,9 @@ export async function startPrivateChat(req, res) {
     const newChat = new Chat({ participants: participants });
     await newChat.save();
 
-    res.status(201).json(newChat);
+    return res.status(201).json(newChat);
   } catch (error) {
     console.error("Error starting private chat:", error);
-    res.status(500).json({ error: "Error starting private chat" });
+    return res.status(500).json({ error: "Error starting private chat" });
   }
 }
