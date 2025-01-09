@@ -4,6 +4,7 @@ import { calculateResults } from "../services/votingService.js";
 export const castVote = async (req, res) => {
   const { walletAddress } = req.user;
   const { shape } = req.body;
+  const {nftNumber} = req.body;
 
   try {
     const existingVote = await Vote.findOne({ walletAddress });
@@ -11,7 +12,7 @@ export const castVote = async (req, res) => {
       return res.status(400).json({ error: "User has already voted." });
     }
 
-    const vote = new Vote({ walletAddress, shape });
+    const vote = new Vote({ walletAddress, shape, nftNumber });
     await vote.save();
     res.status(200).json({ message: "Vote cast successfully!" });
   } catch (error) {
@@ -24,6 +25,7 @@ export const getUserVote = async (req, res) => {
 
   try {
     const vote = await Vote.findOne({ walletAddress });
+    console.log(vote);
     res.status(200).json(vote);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while fetching user vote." });
